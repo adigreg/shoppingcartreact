@@ -80,8 +80,15 @@ const productCardStyles = makeStyles(theme => ({
   }
 }));
 
-const ProductCards = ({products}) => {
+const ProductCards = ({products,openstate,itemstate}) => {
   const classes = productCardStyles();
+
+  const buyshirt = (prod,size) =>{
+    prod["size"] = size
+    var newcart = itemstate.contents.concat([prod]);
+    itemstate.changecart(newcart)
+    openstate.setOpen(true)
+  }
 
   return(
       <Grid container spacing={2} className={classes.grid}>       
@@ -94,10 +101,10 @@ const ProductCards = ({products}) => {
             <CardContent className={classes.content}>
               <div><strong>Price:</strong> {product.currencyFormat + " " + product.price + " " + product.currencyId}</div>
               <div>
-              <Button id="s" className={classes.button} variant="contained" color="primary" size="large">Small</Button>
-              <Button id="m" className={classes.button} variant="contained" color="primary" size="large">Medium</Button>
-              <Button id="l" className={classes.button} variant="contained" color="primary" size="large">Large</Button>
-              <Button id="xl" className={classes.button} variant="contained" color="primary" size="large">XL</Button>
+              <Button id="s" onClick={()=>buyshirt(product,"Small")} className={classes.button} variant="contained" color="primary" size="large">Small</Button>
+              <Button id="m" onClick={()=>buyshirt(product,"Medium")} className={classes.button} variant="contained" color="primary" size="large">Medium</Button>
+              <Button id="l" onClick={()=>buyshirt(product,"Large")} className={classes.button} variant="contained" color="primary" size="large">Large</Button>
+              <Button id="xl" onClick={()=>buyshirt(product,"XL")} className={classes.button} variant="contained" color="primary" size="large">XL</Button>
               </div>
             </CardContent>
           </Card>
@@ -112,25 +119,7 @@ const App = () => {
   const products = Object.values(data);
 
   const [open, setOpen] = React.useState(false); //state for if the cart is open or closed
-  const [contents,changecart] = React.useState([{
-      "sku": 12064273040195392,
-      "title": "Cat Tee Black T-Shirt",
-      "description": "4 MSL",
-      "style": "Black with custom print",
-      "price": 10.9,
-      "currencyId": "USD",
-      "currencyFormat": "$",
-      "isFreeShipping": true
-    }, {
-      "sku": 51498472915966370,
-      "title": "Dark Thug Blue-Navy T-Shirt",
-      "description": "",
-      "style": "Front print and paisley print",
-      "price": 29.45,
-      "currencyId": "USD",
-      "currencyFormat": "$",
-      "isFreeShipping": true
-    }]); //state for the contents in the cart
+  const [contents,changecart] = React.useState([]); //state for the contents in the cart
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -145,7 +134,7 @@ const App = () => {
     <div>
     <h1>Shirt Shop</h1>
     <Cart openstate={{open,setOpen}} itemstate={{contents,changecart}}></Cart>
-    <ProductCards products={products} ></ProductCards>
+    <ProductCards products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}}></ProductCards>
     </div>
   );
 };

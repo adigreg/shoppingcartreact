@@ -19,6 +19,11 @@ const Cart = ({openstate,itemstate}) => {
         },
         listEmpty: {
             width: '300px',
+        },
+        drawerlst: {
+            width: '100%',
+            maxWidth: 360,
+            backgroundColor: theme.palette.background.paper,
         }
     }));
 
@@ -49,10 +54,11 @@ const Cart = ({openstate,itemstate}) => {
                 <h1>My Cart</h1>
                 <ListItem className={classes.listEmpty}></ListItem>
                 <React.Fragment className={classes.root}>
-                    <List component="nav" aria-label="main mailbox folders">
+                    <List className={classes.drawerlst} component="nav" aria-label="main mailbox folders">
                         {itemstate.contents.map(item => <Item shirt={item}></Item>)}
                     </List>
                 </React.Fragment>
+                <Button color="primary" variant="contained" onClick={() => openstate.setOpen(false)}>Close</Button>
             </Drawer>
         </React.Fragment>
     )
