@@ -84,7 +84,6 @@ const ProductCards = ({products,openstate,itemstate}) => {
   const classes = productCardStyles();
 
   const buyshirt = (prod,size) =>{
-    prod["size"] = size
     var newcart = itemstate.contents.concat([prod]);
     itemstate.changecart(newcart)
     openstate.setOpen(true)
@@ -94,7 +93,7 @@ const ProductCards = ({products,openstate,itemstate}) => {
       <Grid container spacing={2} className={classes.grid}>       
       {products.map(product =>
         (<Grid item xs={6}>
-          <Card className={classes.card}>
+          <Card key={product.sku} className={classes.card}>
             <h1><strong>{product.title}</strong></h1>
             {product.style}
             <CardMedia><img src={"data/" + product.sku + "_1.jpg"}></img></CardMedia>

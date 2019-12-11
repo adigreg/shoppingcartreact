@@ -37,7 +37,10 @@ const Cart = ({openstate,itemstate}) => {
         openstate.setOpen(op);
       };
     
-
+      const deleteitem = (shirt) => {
+        var newcart = itemstate.contents.filter(p => p != shirt);
+        itemstate.changecart(newcart);
+    }
 
     return (
         <React.Fragment>
@@ -53,9 +56,11 @@ const Cart = ({openstate,itemstate}) => {
             <Drawer anchor="right" open={openstate.open} onClose={toggle(false)}>
                 <h1>My Cart</h1>
                 <ListItem className={classes.listEmpty}></ListItem>
-                <React.Fragment className={classes.root}>
+                <React.Fragment>
                     <List className={classes.drawerlst} component="nav" aria-label="main mailbox folders">
-                        {itemstate.contents.map(item => <Item shirt={item}></Item>)}
+                        {itemstate.contents.map(item => 
+                        <div><Item shirt={item}></Item>
+                        <Button onClick={()=>{deleteitem(item)}}>Remove</Button></div>)}
                     </List>
                 </React.Fragment>
                 <Button color="primary" variant="contained" onClick={() => openstate.setOpen(false)}>Close</Button>
