@@ -65,7 +65,7 @@ const productCardStyles = makeStyles(theme => ({
     alignItems: 'center',
     flexDirection: 'column',
     width: 500,
-    height: 650,
+    height: 750,
     paddingTop: 20,
   },
   button:{
@@ -80,12 +80,43 @@ const productCardStyles = makeStyles(theme => ({
   }
 }));
 
-const ProductCards = ({products,openstate,itemstate}) => {
+const ProductCards = ({products,openstate,itemstate,small,med,large,xl}) => {
   const classes = productCardStyles();
 
   const buyshirt = (prod,size) =>{
-    var newcart = itemstate.contents.concat([prod]);
-    itemstate.changecart(newcart)
+    if(size=="Small"){
+        if(small.invsmall <= 0){
+          return
+        } else {
+        var newcart = itemstate.contents.concat([prod]);
+        itemstate.changecart(newcart)
+        small.invsmallchange(small.invsmall-1)
+      }
+    } else if(size=="Medium"){
+      if(med.invmed <= 0){
+        return
+      } else {
+        var newcart = itemstate.contents.concat([prod]);
+        itemstate.changecart(newcart)
+        med.invmedchange(med.invmed-1)
+      }
+    } else if(size=="Large"){
+      if(large.invlarge <= 0){
+        return
+      } else {
+        var newcart = itemstate.contents.concat([prod]);
+        itemstate.changecart(newcart)
+        large.invlargechange(large.invlarge-1)
+      }
+    } else if(size=="XL"){
+      if(xl.invxl <= 0){
+        return
+      } else {
+        var newcart = itemstate.contents.concat([prod]);
+        itemstate.changecart(newcart)
+        xl.invxlchange(xl.invxl-1)
+      }
+    }
     openstate.setOpen(true)
   }
 
@@ -100,10 +131,10 @@ const ProductCards = ({products,openstate,itemstate}) => {
             <CardContent className={classes.content}>
               <div><strong>Price:</strong> {product.currencyFormat + " " + product.price + " " + product.currencyId}</div>
               <div>
-              <Button id="s" onClick={()=>buyshirt(product,"Small")} className={classes.button} variant="contained" color="primary" size="large">Small</Button>
-              <Button id="m" onClick={()=>buyshirt(product,"Medium")} className={classes.button} variant="contained" color="primary" size="large">Medium</Button>
-              <Button id="l" onClick={()=>buyshirt(product,"Large")} className={classes.button} variant="contained" color="primary" size="large">Large</Button>
-              <Button id="xl" onClick={()=>buyshirt(product,"XL")} className={classes.button} variant="contained" color="primary" size="large">XL</Button>
+              <Button id="s" onClick={()=>buyshirt(product,"Small")} className={classes.button} variant="contained" color="primary" size="large">Small, {small.invsmall} left!</Button>  
+              <Button id="m" onClick={()=>buyshirt(product,"Medium")} className={classes.button} variant="contained" color="primary" size="large">Medium, {med.invmed} left!</Button>
+              <Button id="l" onClick={()=>buyshirt(product,"Large")} className={classes.button} variant="contained" color="primary" size="large">Large, {large.invlarge} left!</Button>
+              <Button id="xl" onClick={()=>buyshirt(product,"XL")} className={classes.button} variant="contained" color="primary" size="large">XL, {xl.invxl} left!</Button>
               </div>
             </CardContent>
           </Card>
@@ -120,6 +151,11 @@ const App = () => {
   const [open, setOpen] = React.useState(false); //state for if the cart is open or closed
   const [contents,changecart] = React.useState([]); //state for the contents in the cart
 
+  const [invsmall,invsmallchange] = React.useState(5);
+  const [invmed,invmedchange] = React.useState(5);
+  const [invlarge,invlargechange] = React.useState(5);
+  const [invxl,invxlchange] = React.useState(5);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
@@ -133,7 +169,7 @@ const App = () => {
     <div>
     <h1>Shirt Shop</h1>
     <Cart openstate={{open,setOpen}} itemstate={{contents,changecart}}></Cart>
-    <ProductCards products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}}></ProductCards>
+    <ProductCards products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}} small={{invsmall,invsmallchange}} med={{invmed,invmedchange}} large={{invlarge,invlargechange}} xl={{invxl,invxlchange}}></ProductCards>
     </div>
   );
 };
