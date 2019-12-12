@@ -7,9 +7,61 @@ import Grid from '@material-ui/core/Grid';
 import {FormControl, CardHeader, CardContent, CardMedia, Container} from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
+import { Message, Title } from "rbx";
 import Typography from '@material-ui/core/Typography';
 import Drawer from '@material-ui/core/Drawer';
 import Cart from './Cart';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCMvWfA3gAZtKzWNIGTwfqsueQMFKQwPSE",
+  authDomain: "reactshopping-e88a1.firebaseapp.com",
+  databaseURL: "https://reactshopping-e88a1.firebaseio.com",
+  projectId: "reactshopping-e88a1",
+  storageBucket: "reactshopping-e88a1.appspot.com",
+  messagingSenderId: "715749167626",
+  appId: "1:715749167626:web:abfe83bef7af1a405245f3"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref();
+
+const uiConfig = {
+  signInFlow: 'popup',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ],
+  callbacks: {
+    signInSuccessWithAuthResult: () => false
+  }
+};
+
+const Welcome = ({ user }) => (
+  <Message color="info">
+    <Message.Header>
+      Welcome, {user.displayName}
+      <Button primary onClick={() => firebase.auth().signOut()}>
+        Log out
+      </Button>
+    </Message.Header>
+  </Message>
+);
+
+const SignIn = () => (
+  <StyledFirebaseAuth
+    uiConfig={uiConfig}
+    firebaseAuth={firebase.auth()}
+  />
+);
+
+const Banner = ({ user, title }) => (
+  <React.Fragment>
+    { user ? <Welcome user={ user } /> : <SignIn /> }
+    <Title>{ title || '[loading...]' }</Title>
+  </React.Fragment>
+);
 
 const pageOneStyles = makeStyles(theme => ({
   title: {
@@ -156,6 +208,12 @@ const App = () => {
   const [invlarge,invlargechange] = React.useState(5);
   const [invxl,invxlchange] = React.useState(5);
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(setUser);
+  }, []);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
@@ -167,8 +225,8 @@ const App = () => {
 
   return (
     <div>
-    <h1>Shirt Shop</h1>
-    <Cart openstate={{open,setOpen}} itemstate={{contents,changecart}}></Cart>
+    <Banner title="Shirt Shop" user={ user } />
+    <Cart openstate={{open,setOpen}} itemstate={{contents,changecart}} user={user}></Cart>
     <ProductCards products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}} small={{invsmall,invsmallchange}} med={{invmed,invmedchange}} large={{invlarge,invlargechange}} xl={{invxl,invxlchange}}></ProductCards>
     </div>
   );

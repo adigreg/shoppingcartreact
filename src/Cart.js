@@ -4,7 +4,7 @@ import { Button, Drawer, List, ListItem } from '@material-ui/core';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import Item from './Item';
 
-const Cart = ({openstate,itemstate}) => {
+const Cart = ({openstate,itemstate,user}) => {
     const useStyles = makeStyles(theme => ({
         root: {
             width: '100%',
