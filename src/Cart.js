@@ -41,7 +41,7 @@ const Cart = ({openstate,itemstate,user}) => {
         var newcart = itemstate.contents.filter(p => p != shirt);
         itemstate.changecart(newcart);
     }
-
+    console.log(itemstate.contents)
     return (
         <React.Fragment>
             <Button
