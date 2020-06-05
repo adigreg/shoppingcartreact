@@ -27,9 +27,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref();
-const inventory = db.child("inventory");
-const alldata = db.child("alldata");
-const carts = db.child("carts");
 
 const uiConfig = {
   signInFlow: 'popup',
@@ -120,7 +117,7 @@ const productCardStyles = makeStyles(theme => ({
     alignItems: 'center',
     flexDirection: 'column',
     width: 500,
-    height: 650,
+    height: 750,
     paddingTop: 20,
   },
   button:{
@@ -135,57 +132,41 @@ const productCardStyles = makeStyles(theme => ({
   }
 }));
 
-const ProductCards = ({user,products,openstate,itemstate}) => {
+const ProductCards = ({products,openstate,itemstate,small,med,large,xl}) => {
   const classes = productCardStyles();
 
   const buyshirt = (prod,size) =>{
     if(size=="Small"){
-        if(!(Object.keys(inventory).includes(prod.sku)) || (Object.keys(inventory).includes(prod.sku) && !(Object.keys(inventory).child(prod.sku).includes("Small")))){
-          inventory.child(prod.sku).update({"Small":5})
-        }
-        const invval = Object.values(inventory.child(prod.sku))
-        if(invval <= 0){
+        if(small.invsmall <= 0){
           return
         } else {
         var newcart = itemstate.contents.concat([prod]);
         itemstate.changecart(newcart)
-        inventory.child(prod.sku).update({"Small":(invval-1)})
+        small.invsmallchange(small.invsmall-1)
       }
     } else if(size=="Medium"){
-      if(!(Object.keys(inventory).includes(prod.sku)) || (Object.keys(inventory).includes(prod.sku) && !Object.keys(inventory).child(prod.sku).includes("Medium"))){
-        inventory.child(prod.sku).update({"Medium":5})
-      }
-      const invval = inventory.child(prod.sku)["Medium"]
-      if(invval <= 0){
+      if(med.invmed <= 0){
         return
       } else {
         var newcart = itemstate.contents.concat([prod]);
         itemstate.changecart(newcart)
-        inventory.child(prod.sku).update({"Medium":(invval-1)})
+        med.invmedchange(med.invmed-1)
       }
     } else if(size=="Large"){
-      if(!(Object.keys(inventory).includes(prod.sku)) || (Object.keys(inventory).includes(prod.sku) && !Object.keys(inventory).child(prod.sku).includes("Large"))){
-        inventory.child(prod.sku).update({"Large":5})
-      }
-      const invval = inventory.child(prod.sku)["Large"]
-      if(invval <= 0){
+      if(large.invlarge <= 0){
         return
       } else {
         var newcart = itemstate.contents.concat([prod]);
         itemstate.changecart(newcart)
-        inventory.child(prod.sku).update({"Large":(invval-1)})
+        large.invlargechange(large.invlarge-1)
       }
     } else if(size=="XL"){
-      if(!(Object.keys(inventory).includes(prod.sku)) || (Object.keys(inventory).includes(prod.sku) && !Object.keys(inventory).child(prod.sku).includes("XL"))){
-        inventory.child(prod.sku).update({"XL":5})
-      }
-      const invval = inventory.child(prod.sku)["XL"]
-      if(invval <= 0){
+      if(xl.invxl <= 0){
         return
       } else {
         var newcart = itemstate.contents.concat([prod]);
         itemstate.changecart(newcart)
-        inventory.child(prod.sku).update({"XL":(invval-1)})
+        xl.invxlchange(xl.invxl-1)
       }
     }
     openstate.setOpen(true)
@@ -202,10 +183,10 @@ const ProductCards = ({user,products,openstate,itemstate}) => {
             <CardContent className={classes.content}>
               <div><strong>Price:</strong> {product.currencyFormat + " " + product.price + " " + product.currencyId}</div>
               <div>
-              <Button id="s" onClick={()=>buyshirt(product,"Small")} className={classes.button} variant="contained" color="primary" size="large">Small</Button>  
-              <Button id="m" onClick={()=>buyshirt(product,"Medium")} className={classes.button} variant="contained" color="primary" size="large">Medium</Button>
-              <Button id="l" onClick={()=>buyshirt(product,"Large")} className={classes.button} variant="contained" color="primary" size="large">Large</Button>
-              <Button id="xl" onClick={()=>buyshirt(product,"XL")} className={classes.button} variant="contained" color="primary" size="large">XL</Button>
+              <Button id="s" onClick={()=>buyshirt(product,"Small")} className={classes.button} variant="contained" color="primary" size="large">Small, {small.invsmall} left!</Button>  
+              <Button id="m" onClick={()=>buyshirt(product,"Medium")} className={classes.button} variant="contained" color="primary" size="large">Medium, {med.invmed} left!</Button>
+              <Button id="l" onClick={()=>buyshirt(product,"Large")} className={classes.button} variant="contained" color="primary" size="large">Large, {large.invlarge} left!</Button>
+              <Button id="xl" onClick={()=>buyshirt(product,"XL")} className={classes.button} variant="contained" color="primary" size="large">XL, {xl.invxl} left!</Button>
               </div>
             </CardContent>
           </Card>
@@ -221,13 +202,16 @@ const App = () => {
 
   const [open, setOpen] = React.useState(false); //state for if the cart is open or closed
   const [contents,changecart] = React.useState([]); //state for the contents in the cart
-  
+
+  const [invsmall,invsmallchange] = React.useState(5);
+  const [invmed,invmedchange] = React.useState(5);
+  const [invlarge,invlargechange] = React.useState(5);
+  const [invxl,invxlchange] = React.useState(5);
 
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(setUser);
-
   }, []);
 
   useEffect(() => {
@@ -239,14 +223,11 @@ const App = () => {
     fetchProducts();
   }, []);
 
-
-
-
   return (
     <div>
     <Banner title="Shirt Shop" user={ user } />
     <Cart openstate={{open,setOpen}} itemstate={{contents,changecart}} user={user}></Cart>
-    <ProductCards user={user} products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}}></ProductCards>
+    <ProductCards products={products} openstate={{open,setOpen}} itemstate={{contents,changecart}} small={{invsmall,invsmallchange}} med={{invmed,invmedchange}} large={{invlarge,invlargechange}} xl={{invxl,invxlchange}}></ProductCards>
     </div>
   );
 };

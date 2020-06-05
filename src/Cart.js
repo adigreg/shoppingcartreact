@@ -4,7 +4,7 @@ import { Button, Drawer, List, ListItem } from '@material-ui/core';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import Item from './Item';
 
-const Cart = ({openstate,itemstate,user}) => {
+const Cart = ({openstate,itemstate,user,small,med,large,xl}) => {
     const useStyles = makeStyles(theme => ({
         root: {
             width: '100%',
@@ -41,7 +41,7 @@ const Cart = ({openstate,itemstate,user}) => {
         var newcart = itemstate.contents.filter(p => p != shirt);
         itemstate.changecart(newcart);
     }
-    console.log(itemstate.contents)
+
     return (
         <React.Fragment>
             <Button
